@@ -6,7 +6,7 @@ st.set_page_config(page_title="Агрометеорологический аге
 
 # Логотип
 try:
-    logo = Image.open("фронт.jpg")
+    logo = Image.open("logo.jpg")
     st.image(logo, width=200)
 except:
     st.write("Логотип не найден")
