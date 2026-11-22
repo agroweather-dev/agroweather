@@ -1,13 +1,19 @@
 import telebot
 import requests
 import re
+import os
+from dotenv import load_dotenv
 from telebot.types import Message
+from flask import Flask
+import threading
 
+# Загружаем переменные из файла .env
 load_dotenv()
 
 # Теперь токен берется из скрытого файла .env
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
+# Ссылка на Production вебхук Nodul
 NODUL_WEBHOOK_URL = "https://webhook.nodul.ru/28657/prod/3a93f2b4-c2f7-47a1-a808-9d9668975aa9"
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
@@ -97,7 +103,7 @@ def handle_messages(message: Message):
             "latitude": user_data[chat_id]['lat'], 
             "longitude": user_data[chat_id]['lon'],
             "crop": user_data[chat_id]['crop'],
-            "farm_name": user_data[chat_id]['farm_name'] # Передаем название!
+            "farm_name": user_data[chat_id]['farm_name']
         }
         
         try:
@@ -148,7 +154,22 @@ def handle_messages(message: Message):
         if chat_id in user_data:
             del user_data[chat_id]
 
-if __name__ == '__main__':
-    print("Бот запущен...")
+
+# --- БЛОК ДЛЯ ХОСТИНГА (RENDER/RAILWAY) ---
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return "Bot is alive!"
+
+def run_bot():
     bot.remove_webhook()
     bot.polling(none_stop=True)
+
+if __name__ == '__main__':
+    print("Бот запущен...")
+    # Запускаем Telegram-бота в фоновом потоке
+    threading.Thread(target=run_bot, daemon=True).start()
+    # Запускаем веб-сервер Flask для хостинга
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
