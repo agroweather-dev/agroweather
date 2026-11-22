@@ -3,11 +3,14 @@ import requests
 import re
 from telebot.types import Message
 
-# === НАСТРОЙКИ ===
-TELEGRAM_TOKEN = "9117707382:AAHUYzbcA6ZXQK8D8YgzSttvpsZZfQwtuw8"  # Вставьте ваш токен
+load_dotenv()
+
+# Теперь токен берется из скрытого файла .env
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+
 NODUL_WEBHOOK_URL = "https://webhook.nodul.ru/28657/prod/3a93f2b4-c2f7-47a1-a808-9d9668975aa9"
 
-bot = telebot.TeleBot("9117707382:AAHUYzbcA6ZXQK8D8YgzSttvpsZZfQwtuw8")
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 # Хранилище данных и последних сообщений для защиты от дублей
 user_data = {}
